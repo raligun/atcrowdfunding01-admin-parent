@@ -1,0 +1,29 @@
+server:
+    port: 4000
+
+spring:
+  application:
+    name: wzy-crowd-auth
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+  redis:
+    host: 192.168.200.130
+    password: wzy134679
+    jedis:
+      pool:
+        max-idle: 16
+  session:
+    store-type: redis #开启session共享，用redis存储session
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:1000/eureka
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    hostname: localhost
+
+

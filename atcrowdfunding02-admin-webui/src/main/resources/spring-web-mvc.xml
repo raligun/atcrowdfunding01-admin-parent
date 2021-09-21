@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd">
+
+<!-- 配置自动扫描的包 -->
+    <context:component-scan base-package="wzy.crowd" use-default-filters="false">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+
+    <!-- 配置视图解析器 -->
+    <!-- 拼接公式→前缀+逻辑视图+后缀=物理视图 -->
+    <!--
+    @RequestMapping("/xxx/xxx")
+    public String xxx() {
+    // 这个返回值就是逻辑视图
+    return "target";
+    }
+    物理视图是一个可以直接转发过去的地址
+    物理视图："/WEB-INF/"+"target"+".jsp"
+    转发路径："/WEB-INF/target.jsp"
+    -->
+    <bean id="viewResolver"
+    class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <!-- 前缀：附加到逻辑视图名称前 -->
+        <property name="prefix" value="/WEB-INF/"/>
+        <!-- 后缀：附加到逻辑视图名称后 -->
+        <property name="suffix" value=".jsp"/>
+    </bean>
+
+    <!--配置基于xml的异常映射-->
+    <bean id="simpleMappingExceptionResolver" class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <!-- 配置异常类型和具体视图页面对应关系 -->
+        <property name="exceptionMappings">
+            <props>
+                <!-- key属性指定异常全类名，标签体中指定对应的视图(前后缀拼接) -->
+                <prop key="wzy.crowd.exception.AccessForbiddenException">admin_login</prop>
+                <prop key="java.lang.Exception">system-error</prop>
+            </props>
+        </property>
+    </bean>
+
+<!--    <mvc:interceptors>-->
+<!--        <mvc:interceptor>-->
+<!--            &lt;!&ndash; mvc:mapping 配置要拦截的资源 &ndash;&gt;-->
+<!--            &lt;!&ndash; /*对应一层路径，比如：/aaa &ndash;&gt;-->
+<!--            &lt;!&ndash; /**对应多层路径，比如：/aaa/bbb 或/aaa/bbb/ccc 或/aaa/bbb/ccc/ddd &ndash;&gt;-->
+<!--            <mvc:mapping path="/**"/>-->
+<!--            &lt;!&ndash; mvc:exclude-mapping 配置不拦截的资源 &ndash;&gt;-->
+<!--            <mvc:exclude-mapping path="/admin_login"/>-->
+<!--            <mvc:exclude-mapping path="/do/login"/>-->
+<!--            <mvc:exclude-mapping path="/logout"/>-->
+<!--            &lt;!&ndash; 配置拦截器类 &ndash;&gt;-->
+<!--            <bean class="wzy.crowd.interceptor.LoginInterceptor"/>-->
+<!--        </mvc:interceptor>-->
+<!--    </mvc:interceptors>-->
+
+    <!-- 启用注解驱动 -->
+    <mvc:default-servlet-handler/>
+    <mvc:annotation-driven/>
+    <!--    <mvc:resources mapping="/jquery/**" location="/jquery/"/>-->
+    <mvc:view-controller path="/reg" view-name="reg"></mvc:view-controller>
+    <mvc:view-controller path="/admin_login" view-name="admin_login"></mvc:view-controller>
+    <mvc:view-controller path="/admin_main" view-name="admin_main"></mvc:view-controller>
+    <mvc:view-controller path="/admin_add" view-name="admin_add"></mvc:view-controller>
+    <mvc:view-controller path="/role" view-name="role"></mvc:view-controller>
+    <mvc:view-controller path="/menu" view-name="menu"></mvc:view-controller>
+    <!--    <mvc:view-controller path="/admin_user" view-name="admin_user"></mvc:view-controller>-->
+
+
+</beans>

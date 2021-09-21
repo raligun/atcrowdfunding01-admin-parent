@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head th:include="~{/include/include :: include_head}">
+	<style>
+		#send_code_btn{
+			position: absolute;
+			top: 1px;
+			right: 0;
+		//background-color: #fff;
+			border: none;   // 去掉边框
+		outline: none;  // 去掉点击按钮后的边框
+		}
+	</style>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+	<div class="container">
+		<div class="navbar-header">
+			<div><a class="navbar-brand" href="index.html" style="font-size:32px;">尚筹网-创意产品众筹平台</a></div>
+		</div>
+	</div>
+</nav>
+
+<div class="container">
+
+	<form id="register_form" class="form-signin" role="form">
+		<h2 class="form-signin-heading"><i class="glyphicon glyphicon-log-in"></i> 用户注册</h2>
+		<span id="mes" style="color: red"></span>
+		<div class="form-group has-success has-feedback">
+			<input type="text" class="form-control" name="loginacct" placeholder="请输入登录账号" autofocus>
+			<span class="glyphicon glyphicon-user form-control-feedback"></span>
+		</div>
+		<div class="form-group has-success has-feedback">
+			<input type="text" class="form-control" name="userpswd" placeholder="请输入登录密码" style="margin-top:10px;">
+			<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+		</div>
+
+		<div class="form-group has-success has-feedback">
+			<input type="text" class="form-control" name="username" placeholder="请输入昵称" style="margin-top:10px;">
+			<span class="glyphicon glyphicon-lock form-control-feedback"></span>
+		</div>
+		<div class="form-group has-success has-feedback">
+			<input type="text" class="form-control"  name="phoneNum" placeholder="请输入手机号" style="margin-top:10px;">
+			<span class="glyphicon glyphicon glyphicon-earphone form-control-feedback"></span>
+		</div>
+		<div class="form-group has-success has-feedback">
+			<input type="text" class="form-control" name="email" id="email" placeholder="请输入邮箱地址" style="margin-top:10px;">
+			<span class="glyphicon glyphicon glyphicon-envelope form-control-feedback"></span>
+		</div>
+		<div class="form-group has-success has-feedback">
+			<input type="text" class="form-control" name="code" placeholder="请输入验证码" style="margin-top:10px; width: 150px">
+			<span ><button id="send_code_btn" class="btn btn-lg btn-success btn-block"
+						   style="width: 120px;position: absolute;top: 1px;right: 0;border: none;outline: none"> 获取验证码</button>
+</span>
+		</div>
+		<a class="btn btn-lg btn-success btn-block" id="register_btn" > 注册</a>
+	</form>
+</div>
+
+
+<script type="text/javascript">
+
+	// 失去焦点校验用户名
+	$("[name=loginacct]").change(function () {
+		//1、拿到要校验的数据，使用正则表达式
+		var empName = $("[name=loginacct]").val();
+		var regName = /(^[a-zA-Z_-]{3,16}$)/;
+		if(!regName.test(empName)){
+			//alert("用户名必须是2-5位中文或者6-16位英文和数字的组合");
+			$("#mes").empty().append("账户可以是3-16位英文字母和下划线组合");
+		}else {
+			$("#mes").empty();
+		}
+	});
+	// 失去焦点校验密码
+	$("[name=userpswd]").blur(function () {
+		//1、拿到要校验的数据，使用正则表达式
+		var empName = $("[name=userpswd]").val();
+		var regName = /(^[a-zA-Z0-9_-]{5,16}$)/;
+		if(!regName.test(empName)){
+			//alert("用户名必须是2-5位中文或者6-16位英文和数字的组合");
+			$("#mes").empty().append("密码为长度在5-16位的数字字母下划线组合");
+		}else {
+			$("#mes").empty();
+		}
+	});
+	// 失去焦点校验邮箱格式
+	$("[name=email]").blur(function () {
+		//2、校验邮箱信息
+		var email = $("[name=email]").val();
+		var regEmail = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+		if(!regEmail.test(email)){
+			//alert("邮箱格式不正确");
+			//应该清空这个元素之前的样式
+			$("#mes").empty().append("邮箱格式不正确");
+		}else {
+			$("#mes").empty()
+		}
+	});
+
+
+	// 发送注册用户请求
+	$("#register_btn").click(function () {
+		var formData = $("#register_form").serialize();
+			$.ajax({
+				url:"do/member/emailRegister",
+				type:"post",
+				data:formData,
+				success:function (data) {
+					if (data.code != 200){
+						$("#mes").empty().append(data.message);
+						return;
+					}
+
+					layer.msg("注册成功！即将跳转。。。");
+					setTimeout(function(){
+						window.location.href="to/member_login";
+					}, 1200);
+				},
+				error:function (response) {
+					layer.msg(response.status + " " + response.statusText);
+				}
+			})
+		return false;
+
+	})
+	// 获取验证码
+	$("#send_code_btn").click(function () {
+		$.ajax({
+			url:"get/emailCode",
+			type:"post",
+			timeout:6000,
+			data:"email="+$("#email").prop("value"),
+			success:function (data) {
+				if (data.code != 200){
+					layer.msg(data.message+"!请重新发送");
+					return;
+				}
+
+				layer.msg("发送成功！");
+			},
+			error:function (response) {
+				layer.msg(response.status + " " + response.statusText);
+			}
+		});
+		return false;
+	})
+</script>
+</body>
+</html>
